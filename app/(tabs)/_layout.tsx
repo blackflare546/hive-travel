@@ -1,59 +1,141 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { useFonts } from "expo-font";
+import { router, SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
+import { Platform, TouchableOpacity, useColorScheme } from "react-native";
+import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from "expo-router";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: "(tabs)",
+};
+
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      const item = await SecureStore.getItemAsync(key);
+      if (item) {
+        console.log(`${key} was used 🔐 \n`);
+      } else {
+        console.log("No values stored under key: " + key);
+      }
+      return item;
+    } catch (error) {
+      console.error("SecureStore get item error: ", error);
+      await SecureStore.deleteItemAsync(key);
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
+
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+if (!CLERK_PUBLISHABLE_KEY) {
+  throw new Error(
+    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+  );
 }
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
+export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    mon: require("../assets/fonts/Montserrat-Regular.ttf"),
+    "mon-bold": require("../assets/fonts/Montserrat-Bold.ttf"),
+    "mon-sb": require("../assets/fonts/Montserrat-SemiBold.ttf"),
+  });
+
+  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
-      <Tabs.Screen
-        name="index"
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+    >
+      <ClerkLoaded>
+        <RootLayoutNav />
+      </ClerkLoaded>
+    </ClerkProvider>
+  );
+}
+
+function RootLayoutNav() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push("/(modals)/login");
+    }
+  }, [isLoaded]);
+
+  return (
+    <Stack
+      screenOptions={() => ({
+        headerTitleAlign: "center",
+      })}
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+      <Stack.Screen
+        name="(modals)/login"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          headerTitleStyle: { fontFamily: "mon-sb" },
+          title: "Login or Sign up",
+          presentation: Platform.select({
+            ios: "modal",
+            android: "containedModal",
+          }),
+          animation: "slide_from_bottom",
+          animationDuration: 100,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons name="close-circle-outline" size={28} />
+            </TouchableOpacity>
           ),
         }}
       />
-      <Tabs.Screen
-        name="two"
+
+      <Stack.Screen name="listing/[id]" options={{ headerTitle: "" }} />
+
+      <Stack.Screen
+        name="(modals)/booking"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          animation: "fade",
+          headerTitle: "Bookings",
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons name="close-circle-outline" size={28} />
+            </TouchableOpacity>
+          ),
         }}
       />
-    </Tabs>
+    </Stack>
   );
 }
