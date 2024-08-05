@@ -107,7 +107,25 @@ function RootLayoutNav() {
         name="(modals)/login"
         options={{
           headerTitleStyle: { fontFamily: "mon-sb" },
-          title: "Login or Sign up",
+          title: "Login",
+          presentation: Platform.select({
+            ios: "modal",
+            android: "containedModal",
+          }),
+          animation: "slide_from_bottom",
+          animationDuration: 100,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons name="close-circle-outline" size={28} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="(modals)/signup"
+        options={{
+          headerTitleStyle: { fontFamily: "mon-sb" },
+          title: "Sign up",
           presentation: Platform.select({
             ios: "modal",
             android: "containedModal",

@@ -12,18 +12,26 @@ import Colors from "@/constants/Colors";
 import defaultStyles from "@/constants/Styles";
 import { Strategy } from "@/enums/stragery.enum";
 import { useSocialAuth, useWarmUpBrowser } from "@/hooks";
+import { useRouter } from "expo-router";
 
 const LoginPage = () => {
   useWarmUpBrowser();
 
   const { onSelectAuth } = useSocialAuth();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
       <TextInput
         autoCapitalize="none"
         placeholder="Email"
-        style={[defaultStyles.inputField, { marginBottom: 30 }]}
+        style={[defaultStyles.inputField, styles.btn]}
+      />
+      <TextInput
+        autoCapitalize="none"
+        placeholder="Password"
+        secureTextEntry
+        style={[defaultStyles.inputField, styles.btn]}
       />
 
       <TouchableOpacity style={defaultStyles.btn}>
@@ -36,7 +44,7 @@ const LoginPage = () => {
         <View style={styles.horizontalLine} />
       </View>
 
-      <View style={{ gap: 20 }}>
+      <View style={styles.socialAuthContainer}>
         <TouchableOpacity style={styles.btnOutline}>
           <Ionicons
             name="phone-portrait-outline"
@@ -78,6 +86,13 @@ const LoginPage = () => {
           <Text style={styles.btnOutlineText}>Continue with Facebook</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.footerContainer}>
+        <Text>No Account?</Text>
+        <TouchableOpacity onPress={() => router.replace("/(modals)/signup")}>
+          <Text style={{ color: Colors.primary }}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -105,6 +120,9 @@ const styles = StyleSheet.create({
     color: Colors.grey,
     fontSize: 16,
   },
+  btn: {
+    marginBottom: 30,
+  },
   btnOutline: {
     backgroundColor: "#fff",
     borderWidth: 1,
@@ -120,6 +138,15 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontFamily: "mon-sb",
+  },
+  socialAuthContainer: {
+    gap: 20,
+  },
+  footerContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginVertical: 20,
+    justifyContent: "center",
   },
 });
 
