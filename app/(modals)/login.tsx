@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -13,7 +13,6 @@ import defaultStyles from "@/constants/Styles";
 import { Strategy } from "@/enums/stragery.enum";
 import { useEmailLogin, useSocialAuth, useWarmUpBrowser } from "@/hooks";
 import { useRouter } from "expo-router";
-import { useSignIn } from "@clerk/clerk-expo";
 import Spinner from "react-native-loading-spinner-overlay";
 
 const LoginPage = () => {

@@ -27,7 +27,6 @@ export const useSocialAuth = () => {
       const { createdSessionId, setActive } = await selectedAuth();
       if (createdSessionId) {
         setActive!({ session: createdSessionId });
-        console.log("createdSessionId: ", createdSessionId);
         router.back();
       }
     } catch (err) {

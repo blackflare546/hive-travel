@@ -6,6 +6,7 @@ import { Link } from "expo-router";
 const ProfilePage = () => {
   const { signOut, isSignedIn } = useAuth();
 
+  console.log("isSignedIn: ", isSignedIn);
   return (
     <SafeAreaView>
       <View>
@@ -14,7 +15,7 @@ const ProfilePage = () => {
             <Text>Login</Text>
           </Link>
         ) : (
-          <Button title="Sign In" onPress={() => signOut()} />
+          <Button title="Sign Out" onPress={() => signOut()} />
         )}
       </View>
     </SafeAreaView>
