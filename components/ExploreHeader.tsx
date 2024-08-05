@@ -1,18 +1,18 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-} from "react-native";
-import React, { useRef, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Link } from "expo-router";
+import React, { useRef, useState } from "react";
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import Colors from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const categories = [
   {
@@ -57,15 +57,32 @@ const ExploreHeader = ({ onCategoryChanged }: Props) => {
   const selectCategory = (index: number) => {
     const selected = itemsRef.current[index];
     setActiveIndex(index);
-    selected?.measure((x) => {
-      scrollRef.current?.scrollTo({ x: x - 16, y: 0, animated: true });
-    });
+
+    selected?.measureLayout(
+      scrollRef.current!.getInnerViewNode(),
+      (x, y, width) => {
+        const scrollPosition = x - 16;
+
+        scrollRef.current?.scrollTo({
+          x: scrollPosition,
+          y: 0,
+          animated: true,
+        });
+      }
+    );
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onCategoryChanged(categories[index].name);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+    <SafeAreaView
+      style={{
+        flex: Platform.OS === "android" ? 0 : 1,
+        backgroundColor: "#ffff",
+        paddingTop: Platform.OS === "android" ? 10 : 0,
+      }}
+    >
       <View style={styles.container}>
         <View style={styles.actionRow}>
           <Link href={"/(modals)/booking"} asChild>
@@ -131,7 +148,7 @@ const ExploreHeader = ({ onCategoryChanged }: Props) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    height: 130,
+    height: Platform.OS === "android" ? 140 : 130,
     elevation: 2,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -147,6 +164,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 24,
     paddingBottom: 16,
+    paddingTop: Platform.OS === "android" ? 5 : 0,
     gap: 10,
   },
   searchBtn: {
