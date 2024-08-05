@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -31,7 +32,7 @@ const LoginPage = () => {
   } = useEmailLogin();
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Spinner visible={loading} />
       <TextInput
         autoCapitalize="none"
@@ -108,7 +109,7 @@ const LoginPage = () => {
           <Text style={{ color: Colors.primary }}>Sign Up</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -160,7 +161,8 @@ const styles = StyleSheet.create({
   footerContainer: {
     flexDirection: "row",
     gap: 10,
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 40,
     justifyContent: "center",
   },
 });
