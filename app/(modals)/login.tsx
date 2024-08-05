@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,30 +11,46 @@ import {
 import Colors from "@/constants/Colors";
 import defaultStyles from "@/constants/Styles";
 import { Strategy } from "@/enums/stragery.enum";
-import { useSocialAuth, useWarmUpBrowser } from "@/hooks";
+import { useEmailLogin, useSocialAuth, useWarmUpBrowser } from "@/hooks";
 import { useRouter } from "expo-router";
+import { useSignIn } from "@clerk/clerk-expo";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const LoginPage = () => {
   useWarmUpBrowser();
+  const router = useRouter();
 
   const { onSelectAuth } = useSocialAuth();
-  const router = useRouter();
+
+  const {
+    emailAddress,
+    setEmailAddress,
+    password,
+    setPassword,
+    loading,
+    onSignInPress,
+  } = useEmailLogin();
 
   return (
     <View style={styles.container}>
+      <Spinner visible={loading} />
       <TextInput
         autoCapitalize="none"
         placeholder="Email"
+        value={emailAddress}
+        onChangeText={setEmailAddress}
         style={[defaultStyles.inputField, styles.btn]}
       />
       <TextInput
         autoCapitalize="none"
         placeholder="Password"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
         style={[defaultStyles.inputField, styles.btn]}
       />
 
-      <TouchableOpacity style={defaultStyles.btn}>
+      <TouchableOpacity style={defaultStyles.btn} onPress={onSignInPress}>
         <Text style={defaultStyles.btnText}>Continue</Text>
       </TouchableOpacity>
 

@@ -31,7 +31,6 @@ export const useEmailAuth = () => {
         strategy: "email_code",
       });
 
-      // change the UI to verify the email address
       setPendingVerification(true);
     } catch (err: any) {
       alert(err.errors[0].message);

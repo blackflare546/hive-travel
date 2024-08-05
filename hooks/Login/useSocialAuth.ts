@@ -5,7 +5,6 @@ import { Strategy } from "@/enums/stragery.enum";
 
 export const useSocialAuth = () => {
   const router = useRouter();
-  // Todo: Add Email Auth
 
   const { startOAuthFlow: googleAuth } = useOAuth({
     strategy: Strategy.Google,
