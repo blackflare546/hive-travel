@@ -76,13 +76,7 @@ const DetailsPage = () => {
         style={defaultStyles.footer}
         entering={SlideInDown.delay(200)}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.footerContainer}>
           <TouchableOpacity style={styles.footerText}>
             <Text style={styles.footerPrice}>€{listing.price}</Text>
             <Text>night</Text>
@@ -147,6 +141,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+  },
+  footerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   footerText: {
     height: "100%",
