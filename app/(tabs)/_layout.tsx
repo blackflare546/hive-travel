@@ -1,141 +1,69 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
-import { router, SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
-import { Platform, TouchableOpacity, useColorScheme } from "react-native";
-import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/clerk-expo";
-import * as SecureStore from "expo-secure-store";
+import Colors from "@/constants/Colors";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
-
-const tokenCache = {
-  async getToken(key: string) {
-    try {
-      const item = await SecureStore.getItemAsync(key);
-      if (item) {
-        console.log(`${key} was used 🔐 \n`);
-      } else {
-        console.log("No values stored under key: " + key);
-      }
-      return item;
-    } catch (error) {
-      console.error("SecureStore get item error: ", error);
-      await SecureStore.deleteItemAsync(key);
-      return null;
-    }
-  },
-  async saveToken(key: string, value: string) {
-    try {
-      return SecureStore.setItemAsync(key, value);
-    } catch (err) {
-      return;
-    }
-  },
-};
-
-const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
-
-if (!CLERK_PUBLISHABLE_KEY) {
-  throw new Error(
-    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
-  );
-}
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    mon: require("../assets/fonts/Montserrat-Regular.ttf"),
-    "mon-bold": require("../assets/fonts/Montserrat-Bold.ttf"),
-    "mon-sb": require("../assets/fonts/Montserrat-SemiBold.ttf"),
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
+const Layout = () => {
   return (
-    <ClerkProvider
-      tokenCache={tokenCache}
-      publishableKey={CLERK_PUBLISHABLE_KEY}
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors.primary,
+        tabBarLabelStyle: {
+          fontFamily: "mon-sb",
+        },
+      }}
     >
-      <ClerkLoaded>
-        <RootLayoutNav />
-      </ClerkLoaded>
-    </ClerkProvider>
-  );
-}
-
-function RootLayoutNav() {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push("/(modals)/login");
-    }
-  }, [isLoaded]);
-
-  return (
-    <Stack
-      screenOptions={() => ({
-        headerTitleAlign: "center",
-      })}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-      <Stack.Screen
-        name="(modals)/login"
+      <Tabs.Screen
+        name="index"
         options={{
-          headerTitleStyle: { fontFamily: "mon-sb" },
-          title: "Login or Sign up",
-          presentation: Platform.select({
-            ios: "modal",
-            android: "containedModal",
-          }),
-          animation: "slide_from_bottom",
-          animationDuration: 100,
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons name="close-circle-outline" size={28} />
-            </TouchableOpacity>
+          tabBarLabel: "Explore",
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="search" size={size} color={color} />
           ),
         }}
       />
-
-      <Stack.Screen name="listing/[id]" options={{ headerTitle: "" }} />
-
-      <Stack.Screen
-        name="(modals)/booking"
+      <Tabs.Screen
+        name="wishlist"
         options={{
-          animation: "fade",
-          headerTitle: "Bookings",
-          headerLeft: () => (
-            <TouchableOpacity onPress={router.back}>
-              <Ionicons name="close-circle-outline" size={28} />
-            </TouchableOpacity>
+          tabBarLabel: "Wishlist",
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="heart-outline" size={size} color={color} />
           ),
         }}
       />
-    </Stack>
+      <Tabs.Screen
+        name="trips"
+        options={{
+          tabBarLabel: "Trips",
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="airplane-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="inbox"
+        options={{
+          tabBarLabel: "Inbox",
+          tabBarIcon: ({ size, color }) => (
+            <MaterialCommunityIcons
+              name="message-outline"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarLabel: "Profile",
+          headerShown: false,
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="person-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
-}
+};
+
+export default Layout;
