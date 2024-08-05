@@ -121,6 +121,7 @@ function RootLayoutNav() {
           ),
         }}
       />
+
       <Stack.Screen
         name="(modals)/signup"
         options={{

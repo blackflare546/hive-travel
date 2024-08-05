@@ -1,13 +1,29 @@
-import { Link } from "expo-router";
-import React from "react";
+import { Stack } from "expo-router";
+import React, { useState } from "react";
 import { View } from "react-native";
 
+import ExploreHeader from "@/components/ExploreHeader";
+import Listings from "@/components/Listings";
+
 const ExplorePage = () => {
+  const [category, setCategory] = useState<string>("Tiny homes");
+
+  const onDataChanged = (category: string) => {
+    console.log("CHANGE CATEGORY: ", category);
+    setCategory(category);
+  };
+
+  // TODO: ADD API QUERY
+
   return (
-    <View>
-      <Link href={"/(modals)/login"}>Login</Link>
-      <Link href={"/(modals)/booking"}>Booking</Link>
-      <Link href={"/listing/133"}>List Details</Link>
+    <View style={{ flex: 1 }}>
+      <Stack.Screen
+        options={{
+          header: () => <ExploreHeader onCategoryChanged={onDataChanged} />,
+        }}
+      />
+
+      <Listings listings={[]} category={category} />
     </View>
   );
 };
